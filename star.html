@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>star</title>
+		<style type="text/css">
+			html,body{
+				margin: 0;
+				padding: 0;
+			}
+			#canvas{
+				border: none;
+				background: #000;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+		
+		<script type="text/javascript">
+			class Star {
+				constructor(){
+					this.canvas=document.getElementById('canvas');
+					this.ctx=canvas.getContext('2d');
+					this.width=window.innerWidth-10;
+					this.height=window.innerHeight-10;
+					this.num=200;//粒子个数
+					this.list=[];//存放每个粒子
+					this.mouseObj=null;
+					
+					this.canvas.width=this.width;
+					this.canvas.height=this.height;
+					this.init();
+				}
+				/*初始化*/
+				init(){
+					var list=[];
+					for(var i=0;i<this.num;i++){
+						var singleStar={
+							x:Math.random() * window.innerWidth,
+							y:Math.random() * window.innerHeight,
+							sx:Math.random() * 0.6-0.3,
+							sy:Math.random() * 0.6-0.3
+						}
+						list.push(singleStar);
+						this.createStar(singleStar.x,singleStar.y);
+					}
+					this.list=list;
+				}
+				/*监听鼠标移动*/
+				mouseMove(){
+					var _this=this;
+					document.onmousemove=function(e){
+						_this.mouseObj={
+							mx:e.pageX,
+							my:e.pageY
+						}
+					}
+				}
+				/*创建粒子*/
+				createStar(x,y){
+					this.ctx.save();
+					this.ctx.fillStyle='deepskyblue';
+					this.ctx.beginPath();
+					this.ctx.arc(x,y,3,0,2*Math.PI)
+					this.ctx.closePath();
+					this.ctx.fill();
+					this.ctx.restore();
+				}
+				/*创建线条*/
+				createLine(x1,y1,x2,y2){
+					var grd=this.ctx.createLinearGradient(x1,y1,x2,y2);
+		        	grd.addColorStop(0,'pink');
+		        	grd.addColorStop(.6,'green');
+		        	grd.addColorStop(1,'blue');
+					
+					this.ctx.strokeStyle=grd;
+//					this.ctx.strokeStyle='pink';
+					this.ctx.save();
+					this.ctx.beginPath();
+		       		this.ctx.moveTo(x1,y1);
+		       		this.ctx.lineTo(x2,y2);
+		       		this.ctx.stroke();
+		       		this.ctx.closePath();
+		       		this.ctx.restore();
+				}
+				/*更新粒子*/
+				update(){
+					this.mouseMove();
+					this.ctx.clearRect(0,0,this.width,this.height);
+					this.list.forEach((item,index)=>{
+						item.x+=item.sx;
+						item.y+=item.sy;
+						if(item.x<0||item.x>this.width){
+							item.sx=-item.sx;
+						}
+						if(item.y<0||item.y>this.height){
+							item.sy=-item.sy;
+						}
+						this.createStar(item.x,item.y);
+					})
+					/*每次更新都需要重新监听鼠标移动事件*/
+					this.mouseHandler();
+					/*两层循环去判断每个粒子间的距离*/
+					for(var i=0;i<this.num;i++){
+						/*处理鼠标移动事件*/
+						if(this.mouseObj!=null){
+							var d=Math.sqrt(Math.pow(this.list[i].x-this.mouseObj.x,2)+Math.pow(this.list[i].y-this.mouseObj.y,2))
+							if(d<150){
+								this.createLine(this.mouseObj.x,this.mouseObj.y,this.list[i].x,this.list[i].y);
+							}
+						}
+						for(var j=i+1;j<this.num;j++){
+							/*利用勾股定理来判断粒子间的距离*/
+							var d=Math.sqrt(Math.pow(this.list[i].x-this.list[j].x,2)+Math.pow(this.list[i].y-this.list[j].y,2))
+							if(d<80){
+								this.createLine(this.list[i].x,this.list[i].y,this.list[j].x,this.list[j].y);
+							}
+						}
+					}
+				}
+				mouseHandler(){
+					var _this=this;
+					document.removeEventListener('mousemove',run);
+					document.addEventListener('mousemove',run,false);
+					function run(e){
+						_this.mouseObj={
+							x:e.pageX,
+							y:e.pageY
+						}
+					}
+				}
+				/*启动计时器*/
+				move(){
+					setInterval(()=>{
+						this.update();
+					})
+				}
+			}
+			
+			var s=new Star();
+			s.move();
+			
+			
+		</script>
+	</body>
+</html>
