@@ -47,16 +47,6 @@
 					}
 					this.list=list;
 				}
-				/*监听鼠标移动*/
-				mouseMove(){
-					var _this=this;
-					document.onmousemove=function(e){
-						_this.mouseObj={
-							mx:e.pageX,
-							my:e.pageY
-						}
-					}
-				}
 				/*创建粒子*/
 				createStar(x,y){
 					this.ctx.save();
@@ -86,7 +76,6 @@
 				}
 				/*更新粒子*/
 				update(){
-					this.mouseMove();
 					this.ctx.clearRect(0,0,this.width,this.height);
 					this.list.forEach((item,index)=>{
 						item.x+=item.sx;
