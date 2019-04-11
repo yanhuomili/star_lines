@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>粒子连线</title>
+        <style>
+            body{
+                margin:0;
+            }
+            #canvas{
+                display: block;
+                background-color: black;
+                border: 2px solid blue;
+            }
+        </style>
+    </head>
+        <canvas id="canvas" width="500" height="500"></canvas>
+        <script>
+        	var canvas=document.getElementById('canvas');
+        	canvas.width=800;
+        	canvas.height=800;
+        	var ctx=canvas.getContext('2d');
+        	
+        	/*绘制矩形*/
+        	ctx.fillStyle='aquamarine';
+        	ctx.fillRect(10,10,100,100);
+        	
+        	/*绘制框架*/
+        	ctx.strokeStyle='chartreuse';
+        	ctx.strokeRect(10,120,100,100);
+        	
+        	
+        	/*绘制三角形线条*/
+        	/*save()保存当前前的状态，可以调用Canvas的平移、放缩、旋转、错切、裁剪等操作，
+        		调用restore()来释放保存的状态，防止canvas执行的操作对后续的绘制产生影响
+        	*/
+        	ctx.save();
+        	
+          	ctx.translate(300,150); 
+        	ctx.rotate( 30 / 180 * Math.PI);
+        	
+        	ctx.strokeStyle='red';
+        	ctx.beginPath();//开始路径,重新开始路径，避免与前一个绘制相互干扰
+        	ctx.moveTo(150,150);//定义线条开始坐标
+        	ctx.lineTo(300,150);//定义线条结束坐标
+        	ctx.lineTo(300,300);
+        	ctx.closePath();//路径闭合，闭合后就不会影响后面的绘制
+        	ctx.stroke();
+        	ctx.restore();//恢复之前保存的状态
+        	
+        	
+        	
+        	/*旋转形状*/
+        	ctx.strokeStyle='red';
+        	ctx.strokeRect(250,250,100,100);
+        	var n=0;
+        	setInterval(()=>{
+        		n+=0.01;
+        		ctx.save();//保存状态
+        		ctx.strokeStyle='royalblue';
+        		ctx.translate(300,300);//将画布移动到旋转中心
+        		ctx.rotate(n*Math.PI);//再旋转画布
+        		ctx.strokeRect(-50,-50,100,100);//绘制图形
+        		ctx.restore();//恢复状态
+        	},50)
+        	
+        	
+        	
+        	/*绘制三角形填充*/
+        	ctx.fillStyle='greenyellow';
+        	ctx.beginPath();
+        	ctx.moveTo(10,300);
+        	ctx.lineTo(10,400);
+        	ctx.lineTo(110,400);
+        	ctx.closePath();
+        	ctx.fill();
+        	
+        	/*绘制笑脸*/
+        	ctx.strokeStyle='pink';
+        	ctx.beginPath();
+        	ctx.arc(300,50,50,0,2*Math.PI);
+        	ctx.closePath();
+        	ctx.stroke();
+        	ctx.beginPath();
+        	ctx.arc(320,35,10,0,2*Math.PI);
+        	ctx.closePath();
+        	ctx.stroke();
+        	ctx.beginPath();
+        	ctx.arc(280,35,10,0,2*Math.PI);
+        	ctx.closePath();
+        	ctx.stroke();
+        	ctx.beginPath();
+        	ctx.arc(300,55,30,.2*Math.PI,.8*Math.PI);
+//      	ctx.closePath();
+        	ctx.stroke();
+        	
+        	
+        	/*两点之间绘制直线*/
+        	ctx.strokeStyle='#f60';
+        	
+        	document.onmousemove=function(e){
+        		var x1=e.pageX;
+        		var y1=e.pageY;
+        		var x2=500;
+        		var y2=500;
+        		var d=Math.sqrt(Math.pow(Math.abs(x1-x2),2)+Math.pow(Math.abs(y1-y2),2))
+        		if(d<50){
+        			createLines(x1,y1,500,500);
+        		}
+        	}
+        	
+        	var n1=400;
+        	var left=true;
+        	setInterval(()=>{
+        		if(n1<=400){
+        			left=true;
+        		}
+        		if(n1>=500){
+        			left=false;
+        		}
+        		if(left){
+        			n1++
+        		}else{
+        			n1--
+        		}
+        		ctx.clearRect(390,550,120,20);
+        		
+        		ctx.strokeStyle='pink';
+        		ctx.beginPath();
+	        	ctx.arc(n1,560,5,0,2*Math.PI);
+	        	ctx.closePath();
+	        	ctx.fill();
+	        	
+	        	ctx.beginPath();
+	        	ctx.arc(500,500,5,0,2*Math.PI);
+	        	ctx.closePath();
+	        	ctx.fill();
+	        	
+	        	ctx.beginPath();
+	        	ctx.arc(560,530,5,0,2*Math.PI);
+	        	ctx.closePath();
+	        	ctx.fill();
+	        	if(n1<450){
+	        		createLines(n1,560,500,500);
+	        	}
+        	},50)
+        	
+			function createLines(x1,y1,x2,y2){
+				ctx.beginPath();
+	       		ctx.moveTo(x1,y1);
+	       		ctx.lineTo(x2,y2);
+	       		ctx.stroke();
+	       		ctx.closePath();
+			}
+        	
+        	
+        	
+        	
+        	/*绘制文字*/
+        	ctx.fillStyle='deeppink';
+        	ctx.font='36px Arial';
+        	ctx.fillText('你好 世界',500,100);
+        	/*空心文字0*/
+        	ctx.strokeText('hello wrold',500,50);
+        	
+        	/*绘制颜色渐变,线性渐变*/
+        	var grd=ctx.createLinearGradient(0,0,210,0);
+        	grd.addColorStop(0,'pink');
+        	grd.addColorStop(.3,'green');
+        	grd.addColorStop(.6,'black');
+        	grd.addColorStop(.8,'white');
+        	grd.addColorStop(1,'red');
+        	ctx.fillStyle=grd;
+        	ctx.fillRect(10,600,200,100);
+        	
+        	/*绘制颜色渐变,径向渐变*/
+        	var grd=ctx.createRadialGradient(500,700,20,500,700,50);
+        	grd.addColorStop(0,'pink');
+//      	grd.addColorStop(.3,'green');
+//      	grd.addColorStop(.6,'black');
+//      	grd.addColorStop(.8,'white');
+        	grd.addColorStop(1,'red');
+        	ctx.fillStyle=grd;
+        	ctx.beginPath();
+        	ctx.arc(500,700,100,0,2*Math.PI);
+        	ctx.closePath();
+        	ctx.fill();
+        	
+        </script>
+    <body>
+    </body>
+</html>
